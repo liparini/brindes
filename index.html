@@ -1,154 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Controle de Estoque de Brindes</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Brindes</title>
   <style>
-    :root {
-      --bg: #0f1724;
-      --accent: #0ea5a3;
-      --muted: #94a3b8;
-    }
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(180deg, #071028 0%, #071827 100%);
-      color: #e6eef6;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    .container { width: 100%; max-width: 1000px; }
-    header { text-align: center; margin-bottom: 30px; padding: 0 10px; }
-    header h1 { font-size: 1.6rem; margin: 0; }
-    p.lead { color: var(--muted); margin-top: 8px; }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 18px;
-    }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.1));
-      border: 1px solid rgba(255,255,255,0.06);
-      padding: 16px;
-      border-radius: 14px;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #101820, #1a1a1a);
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: transform .22s ease, box-shadow .22s;
+      min-height: 100vh;
     }
-    .card:hover { transform: translateY(-4px); box-shadow: 0 4px 20px rgba(2,6,23,0.6); }
-    .thumb {
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .estoque {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
       width: 100%;
-      max-width: 180px;
-      height: 120px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 2rem;
-      color: #071827;
-      background: linear-gradient(180deg, #e6eef6, #cde7e6);
-      margin-bottom: 10px;
+      max-width: 900px;
     }
-    .title { font-weight: 600; margin-bottom: 6px; text-align: center; }
-    .estoque { font-size: 0.95rem; color: var(--muted); margin-bottom: 10px; }
+
+    .item {
+      background: #222;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .item:hover {
+      transform: scale(1.03);
+    }
+
     button {
-      background: linear-gradient(90deg, var(--accent), #06b6d4);
+      background: #ffcc00;
+      color: #000;
       border: none;
-      border-radius: 10px;
-      color: #052027;
-      font-weight: 600;
-      padding: 8px 16px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
       cursor: pointer;
-      transition: transform .2s ease;
-      width: 100%;
-      max-width: 160px;
-    }
-    button:hover { transform: scale(1.05); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    footer { text-align: center; margin-top: 30px; color: var(--muted); font-size: 0.85rem; padding: 0 10px; }
-
-    @media (max-width: 768px) {
-      header h1 { font-size: 1.4rem; }
-      .thumb { height: 100px; font-size: 1.6rem; }
-      button { font-size: 0.9rem; }
+      transition: background 0.3s;
     }
 
-    @media (max-width: 480px) {
-      body { padding: 10px; }
-      .grid { grid-template-columns: 1fr; }
-      .thumb { max-width: 100%; height: 90px; font-size: 1.5rem; }
-      .title { font-size: 1rem; }
-      .estoque { font-size: 0.9rem; }
-      button { font-size: 0.85rem; padding: 6px 12px; }
+    button:hover {
+      background: #ffdd33;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
+      .item {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎁 Controle de Estoque de Brindes</h1>
-      <p class="lead">Clique em <strong>Baixar</strong> para retirar 1 unidade do estoque.</p>
-    </header>
-
-    <main class="grid" id="brindesGrid"></main>
-
-    <footer>
-      <small>Os dados do estoque são salvos no navegador (localStorage).</small>
-    </footer>
-  </div>
+  <h1>Controle de Brindes 🎁</h1>
+  <div class="estoque" id="estoque"></div>
 
   <script>
-    const brindesIniciais = [
-      { nome: 'Batman', quantidade: 3, emoji: '🦇' },
-      { nome: 'Mulher-Maravilha', quantidade: 4, emoji: '💫' },
-      { nome: 'Capitão América', quantidade: 8, emoji: '🛡️' },
-      { nome: 'Homem de Ferro', quantidade: 1, emoji: '🤖' },
-      { nome: 'Video Game', quantidade: 4, emoji: '🎮' },
-      { nome: 'Batman/Superman', quantidade: 2, emoji: '🦸‍♂️' },
-      { nome: 'Jason', quantidade: 1, emoji: '🎭' },
-      { nome: 'Wolverine', quantidade: 1, emoji: '🦾' }
-    ];
+    const estoqueInicial = {
+      'Batman': 3,
+      'Mulher-Maravilha': 4,
+      'Capitão América': 8,
+      'Homem de Ferro': 1,
+      'Video Game': 4,
+      'Batman/Superman': 2,
+      'Jason': 1,
+      'Wolverine': 1
+    };
 
-    const estoque = JSON.parse(localStorage.getItem('estoqueBrindes')) || brindesIniciais;
-    const grid = document.getElementById('brindesGrid');
+    // Carrega estoque do localStorage ou usa inicial
+    let estoque = JSON.parse(localStorage.getItem('estoqueBrindes')) || { ...estoqueInicial };
+
+    const container = document.getElementById('estoque');
 
     function salvarEstoque() {
       localStorage.setItem('estoqueBrindes', JSON.stringify(estoque));
     }
 
-    function atualizarGrid() {
-      grid.innerHTML = '';
-      estoque.forEach((brinde, index) => {
-        const card = document.createElement('article');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="thumb">${brinde.emoji}</div>
-          <div class="title">${brinde.nome}</div>
-          <div class="estoque">Estoque: <strong id="qtd-${index}">${brinde.quantidade}</strong></div>
-          <button ${brinde.quantidade === 0 ? 'disabled' : ''} onclick="baixar(${index})">Baixar</button>
-        `;
-        grid.appendChild(card);
+    function renderizarEstoque() {
+      container.innerHTML = '';
+      Object.entries(estoque).forEach(([nome, qtd]) => {
+        if (qtd > 0) {
+          const div = document.createElement('div');
+          div.className = 'item';
+          div.innerHTML = `
+            <h2>${nome}</h2>
+            <p>Quantidade: <strong>${qtd}</strong></p>
+            <button data-item="${nome}">Baixar</button>
+          `;
+          container.appendChild(div);
+        }
+      });
+
+      document.querySelectorAll('button[data-item]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const item = e.target.getAttribute('data-item');
+          if (estoque[item] > 0) {
+            estoque[item]--;
+            if (estoque[item] === 0) {
+              delete estoque[item];
+            }
+            salvarEstoque();
+            renderizarEstoque();
+          }
+        });
       });
     }
 
-    window.baixar = function(index) {
-      if (estoque[index].quantidade > 0) {
-        estoque[index].quantidade--;
-        document.getElementById(`qtd-${index}`).textContent = estoque[index].quantidade;
-        salvarEstoque();
-        atualizarGrid();
-      }
-    }
-
-    atualizarGrid();
+    renderizarEstoque();
   </script>
 </body>
 </html>
